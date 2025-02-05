@@ -1,0 +1,16 @@
+[
+	{
+		"id": 11,
+		"nome": "Guilherme Pedro",
+		"endereco": "Rua gabriel ferreira 1605",
+		"telefone": "(11) 98765-4321",
+		"bairro": "Macauba"
+	},
+	{
+		"id": 12,
+		"nome": "Pedro Venancio",
+		"endereco": "Rua das banzeiros, 123",
+		"telefone": "(11) 98765-4321",
+		"bairro": "Centro"
+	}
+]

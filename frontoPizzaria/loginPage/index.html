@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Cliente</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Cadastro de Cliente</h2>
+        <form id="formCadastro" onsubmit="return cadastrarCliente(event)">
+            <div class="form-group">
+                <label for="nome">Nome do Cliente:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            <div class="form-group">
+                <label for="endereco">Endereço:</label>
+                <input type="text" id="endereco" name="endereco" required>
+            </div>
+            <div class="form-group">
+                <label for="telefone">Telefone:</label>
+                <input type="tel" id="telefone" name="telefone" required>
+            </div>
+            <div class="form-group">
+                <label for="bairro">Bairro:</label>
+                <input type="text" id="bairro" name="bairro" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Cadastrar</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        async function cadastrarCliente(event) {
+            event.preventDefault();  // Impede o envio normal do formulário
+    
+            // Captura os valores do formulário
+            const nome = document.getElementById("nome").value;
+            const endereco = document.getElementById("endereco").value;
+            const telefone = document.getElementById("telefone").value;
+            const bairro = document.getElementById("bairro").value;
+    
+            // Cria o objeto com os dados
+            const dados = {
+                nome: nome,
+                endereco: endereco,
+                telefone: telefone,
+                bairro: bairro
+            };
+    
+            try {
+                const resposta = await fetch("http://127.0.0.1:8080/clientes", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)
+                });
+    
+                if (resposta.ok) {
+                    console.log("Cadastro realizado com sucesso!");
+                    alert("Cliente cadastrado com sucesso!");
+    
+                    // Redireciona após o cadastro
+                    setTimeout(() => {
+                        window.location.href = '../pedidos';
+                    }, 2000);
+                } else {
+                    console.error("Erro ao cadastrar:", resposta.statusText);
+                    alert("Erro ao cadastrar cliente.");
+                }
+            } 
+            catch (erro) {
+                console.error("Erro na requisição:", erro);
+                alert("Erro na comunicação com o servidor.");
+            }
+        }
+    </script>
+</body>
+</html>

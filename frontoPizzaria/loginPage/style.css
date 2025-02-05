@@ -1,0 +1,113 @@
+/* Resetando margens e padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilizando o corpo */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e8e8e8;  /* Tom de cinza claro no fundo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+}
+
+/* Estilizando o contêiner do formulário */
+.container {
+    background-color: #f9f9f9; /* Fundo levemente bege */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #ddd;  /* Adiciona uma borda suave */
+}
+
+/* Título do formulário */
+h2 {
+    text-align: center;
+    font-size: 24px;
+    color: #444;  /* Cor um pouco mais escura que o normal */
+    margin-bottom: 30px;
+}
+
+/* Estilizando os grupos de campos */
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Estilizando as labels */
+label {
+    display: block;
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+/* Estilizando os campos de entrada */
+input[type="text"], input[type="tel"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-top: 5px;
+    background-color: #f4f4f4;  /* Fundo suave e neutro */
+    color: #444;
+}
+
+/* Foco nos campos de entrada */
+input[type="text"]:focus, input[type="tel"]:focus {
+    border-color: #007bff;
+    outline: none;
+    background-color: #fff;
+}
+
+/* Estilizando o botão de envio */
+button {
+    width: 100%;
+    padding: 15px;
+    background-color: #5a9bff; /* Azul mais suave */
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #3e79c1; /* Azul um pouco mais forte no hover */
+}
+
+/* Estilizando o botão de envio quando desabilitado */
+button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+/* Responsividade: Ajustes para telas pequenas */
+@media (max-width: 480px) {
+    .container {
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    input[type="text"], input[type="tel"] {
+        font-size: 14px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 12px;
+    }
+}

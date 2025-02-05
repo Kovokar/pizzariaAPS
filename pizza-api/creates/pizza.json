@@ -1,0 +1,15 @@
+[
+	{
+		"sabor": "Margherita",
+		"preco_base": 30
+	},
+	{
+		"id": 12,
+		"sabor": "Calabreso",
+		"preco_base": 40
+	},
+	{
+		"sabor": "Carno de sol",
+		"preco_base": 50
+	}
+]

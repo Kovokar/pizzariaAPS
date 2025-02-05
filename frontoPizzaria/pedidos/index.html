@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+
+<body>
+    <div class="container">
+        <h2>Pedido de Pizza</h2>
+
+        <!-- Formulário de Pedido -->
+        <form id="formPedido">
+            <div class="form-group">
+                <label for="sabor">Sabor da Pizza:</label>
+                <select id="sabor" required></select>
+            </div>
+
+            <div class="form-group">
+                <label for="tamanho">Tamanho da Pizza:</label>
+                <select id="tamanho" required></select>
+            </div>
+
+            <div class="form-group">
+                <label for="quantidade">Quantidade de Pizzas:</label>
+                <input type="number" id="quantidade" value="1" min="1" required>
+            </div>
+
+            <div class="form-group">
+                <label for="preco">Preço Total:</label>
+                <input type="text" id="preco" disabled>
+            </div>
+
+            <div class="form-group">
+                <button type="button" onclick="adicionarPedido()">Adicionar</button>
+            </div>
+        </form>
+
+        <!-- Tabela de Pedidos -->
+        <table id="tabelaPedidos">
+            <thead>
+                <tr>
+                    <th>Quantidade</th>
+                    <th>Sabor</th>
+                    <th>Tamanho</th>
+                    <th>Preço</th>
+                    <th>Remover</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <!-- Botão Finalizar Pedido -->
+        <div class="form-group" id="finalizarContainer" style="display: none;">
+            <button type="button" onclick="finalizarPedido()">Finalizar Pedido</button>
+        </div>
+
+        <!-- Resumo do Pedido -->
+        <div id="resumoPedido" style="display: none;">
+            <h3>Resumo do Pedido</h3>
+            <ul id="listaResumo"></ul>
+            <h4 id="precoFinal"></h4>
+            <button type="button" onclick="confirmarPedido()">Confirmar Pedido</button>
+        </div>
+    </div>
+
+
+
+
+    
+    <script>
+        let precosBase = {};
+        let modificadores = {};
+        let pedidos = [];
+        let pizzasInfo = {};
+        let tamanhosInfo = {};
+        const clienteId = 17; // ID fixo do cliente
+
+        async function carregarOpcoes() {
+            try {
+                const respostaPizzas = await fetch("http://127.0.0.1:8080/pizzas");
+                const pizzas = await respostaPizzas.json();
+                const selectSabor = document.getElementById("sabor");
+                selectSabor.innerHTML = "";
+                pizzas.forEach(pizza => {
+                    pizzasInfo[pizza.sabor] = pizza.id;
+                    precosBase[pizza.sabor] = pizza.preco_base;
+                    const option = document.createElement("option");
+                    option.value = pizza.sabor;
+                    option.textContent = pizza.sabor;
+                    selectSabor.appendChild(option);
+                });
+
+                const respostaTamanhos = await fetch("http://127.0.0.1:8080/tamanhos");
+                const tamanhos = await respostaTamanhos.json();
+                const selectTamanho = document.getElementById("tamanho");
+                selectTamanho.innerHTML = "";
+                tamanhos.forEach(tamanho => {
+                    tamanhosInfo[tamanho.nome] = tamanho.id;
+                    modificadores[tamanho.nome] = tamanho.modificador;
+                    const option = document.createElement("option");
+                    option.value = tamanho.nome;
+                    option.textContent = tamanho.nome;
+                    selectTamanho.appendChild(option);
+                });
+
+                calcularPreco();
+            } catch (erro) {
+                console.error("Erro ao carregar opções:", erro);
+                alert("Erro ao carregar sabores e tamanhos.");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", carregarOpcoes);
+
+        function calcularPreco() {
+            const sabor = document.getElementById("sabor").value;
+            const tamanho = document.getElementById("tamanho").value;
+            const quantidade = parseInt(document.getElementById("quantidade").value);
+            const precoBase = precosBase[sabor] || 0;
+            const modificador = modificadores[tamanho] || 1;
+            const precoTotal = precoBase * modificador * quantidade;
+            document.getElementById("preco").value = `R$ ${precoTotal.toFixed(2)}`;
+        }
+
+        document.getElementById("sabor").addEventListener("change", calcularPreco);
+        document.getElementById("tamanho").addEventListener("change", calcularPreco);
+        document.getElementById("quantidade").addEventListener("input", calcularPreco);
+
+        function atualizarBotaoFinalizar() {
+            document.getElementById("finalizarContainer").style.display = pedidos.length > 0 ? "block" : "none";
+        }
+
+        function adicionarPedido() {
+            const sabor = document.getElementById("sabor").value;
+            const tamanho = document.getElementById("tamanho").value;
+            const quantidade = document.getElementById("quantidade").value;
+            const preco = document.getElementById("preco").value;
+
+            if (!sabor || !tamanho || !quantidade) {
+                alert("Por favor, selecione sabor, tamanho e quantidade.");
+                return;
+            }
+
+            const tabela = document.getElementById("tabelaPedidos").getElementsByTagName("tbody")[0];
+            const novaLinha = tabela.insertRow();
+
+            novaLinha.insertCell(0).textContent = quantidade;
+            novaLinha.insertCell(1).textContent = sabor;
+            novaLinha.insertCell(2).textContent = tamanho;
+            novaLinha.insertCell(3).textContent = preco;
+            novaLinha.insertCell(4).innerHTML = '<button type="button" onclick="removerPedido(this)">Remover</button>';
+
+            pedidos.push({ sabor, tamanho, quantidade, preco });
+
+            atualizarBotaoFinalizar();
+            document.getElementById("formPedido").reset();
+            calcularPreco();
+        }
+
+        function removerPedido(button) {
+            const row = button.parentElement.parentElement;
+            const index = row.rowIndex - 1;
+            pedidos.splice(index, 1);
+            row.remove();
+            atualizarBotaoFinalizar();
+        }
+
+        function finalizarPedido() {
+            if (pedidos.length === 0) {
+                alert("Adicione pelo menos um pedido antes de finalizar.");
+                return;
+            }
+
+            const listaResumo = document.getElementById("listaResumo");
+            listaResumo.innerHTML = "";
+            let precoTotal = 0;
+
+            pedidos.forEach(pedido => {
+                precoTotal += parseFloat(pedido.preco.replace("R$ ", "").replace(",", "."));
+                const li = document.createElement("li");
+                li.textContent = `${pedido.quantidade}x ${pedido.sabor} (${pedido.tamanho}) - ${pedido.preco}`;
+                listaResumo.appendChild(li);
+            });
+
+            document.getElementById("precoFinal").textContent = `Total: R$ ${precoTotal.toFixed(2)}`;
+            document.getElementById("resumoPedido").style.display = "block";
+        }
+
+        async function confirmarPedido() {
+            for (const pedido of pedidos) {
+                const pedidoData = {
+                    quantidade: parseInt(pedido.quantidade),
+                    pizza_id: pizzasInfo[pedido.sabor],
+                    tamanho_id: tamanhosInfo[pedido.tamanho],
+                    cliente_id: clienteId
+                };
+
+                await fetch("http://127.0.0.1:8080/finalizado", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(pedidoData)
+                });
+            }
+
+            alert("Pedido finalizado com sucesso!");
+            pedidos = [];
+            document.getElementById("tabelaPedidos").getElementsByTagName("tbody")[0].innerHTML = "";
+            document.getElementById("resumoPedido").style.display = "none";
+            atualizarBotaoFinalizar();
+        }
+    </script>
+
+
+
+
+</body>
+</html>
