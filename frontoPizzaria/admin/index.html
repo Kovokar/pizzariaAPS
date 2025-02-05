@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Pizzas - Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Cadastro de Novas Pizzas</h2>
+
+        <form id="formPizza">
+            <div class="form-group">
+                <label for="nomePizza">Nome da Pizza:</label>
+                <input type="text" id="nomePizza" required>
+            </div>
+
+            <div class="form-group">
+                <label for="precoPizza">Preço:</label>
+                <input type="number" id="precoPizza" step="0.01" required>
+            </div>
+
+            <button type="button" onclick="adicionarPizza()">Cadastrar</button>
+        </form>
+
+        <h3>Pizzas Cadastradas</h3>
+        <ul id="listaPizzas"></ul>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", carregarPizzas);
+
+        function carregarPizzas() {
+            fetch("http://127.0.0.1:8080/pizzas")
+                .then(res => res.json())
+                .then(pizzas => {
+                    const lista = document.getElementById("listaPizzas");
+                    lista.innerHTML = "";
+                    pizzas.forEach(({ sabor, preco_base }) => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `<h4>${sabor}</h4><p><strong>Preço:</strong> R$ ${preco_base.toFixed(2)}</p>`;
+                        lista.appendChild(li);
+                    });
+                })
+                .catch(err => console.error("Erro ao carregar pizzas:", err));
+        }
+
+        function adicionarPizza() {
+            const nome = document.getElementById("nomePizza").value.trim();
+            const preco = parseFloat(document.getElementById("precoPizza").value);
+
+            if (!nome || isNaN(preco)) {
+                alert("Preencha os campos corretamente!");
+                return;
+            }
+
+            fetch("http://127.0.0.1:8080/pizzas", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sabor: nome, preco_base: preco })
+            })
+            .then(res => res.json())
+            .then(() => {
+                alert("Pizza cadastrada!");
+                carregarPizzas();
+                document.getElementById("formPizza").reset();
+            })
+            .catch(err => alert("Erro ao cadastrar pizza!"));
+        }
+    </script>
+</body>
+</html>
