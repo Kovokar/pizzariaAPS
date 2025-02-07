@@ -1,0 +1,11 @@
+sudo rm -rf /usr/local/go && wget https://go.dev/dl/go1.22.1.linux-amd64.tar.gz && sudo tar -C /usr/local -xzf go1.22.1.linux-amd64.tar.gz
+or 
+sudo apt-get install golang
+
+go version
+
+go mod init nome-do-modulo
+go mod tidy
+go get github.com/gin-gonic/gin
+go list -m all
+
